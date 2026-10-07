@@ -37,7 +37,7 @@ export default function CafeCard({ cafe, onHover, onClick, isActive }: CafeCardP
           {/* Availability Badge */}
           <div className="absolute bottom-3 left-3">
             <div className="bg-neutral/90 backdrop-blur-md text-surface text-xs font-semibold px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-md">
-              <span className={`w-2 h-2 rounded-full ${cafe.desks_available > 0 ? 'bg-tertiary-container text-on-tertiary-container' : 'bg-error text-on-error'}`}></span>
+              <span className={`w-2 h-2 rounded-full ${cafe.desks_available > 0 ? 'bg-emerald-400' : 'bg-error text-on-error'}`}></span>
               {cafe.desks_available > 0 ? `${cafe.desks_available} desks available` : 'At capacity'}
             </div>
           </div>

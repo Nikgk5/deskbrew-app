@@ -76,56 +76,60 @@ export default function Map({ cafes, activeCafeId, onCafeHover, onBoundsChange, 
           }}
         >
           <div 
-            className={`
-              relative cursor-pointer group transition-all duration-300 ease-out
-              ${isActive ? 'scale-110 z-50' : 'scale-100 z-10 hover:z-40 hover:scale-105'}
-            `}
+            className="p-4 -m-4 relative z-10 hover:z-50"
             onMouseEnter={() => onCafeHover(cafe.id)}
             onMouseLeave={() => onCafeHover(null)}
           >
-            {/* The Pin */}
-            {isActive ? (
-              <div className="flex flex-col items-center">
-                {/* Custom Active Pop-up */}
-                <div className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 flex items-center bg-surface rounded-3xl shadow-level-2 p-1.5 pr-4 border border-outline-variant whitespace-nowrap min-w-max z-50">
-                  <div className="relative w-10 h-10 rounded-full overflow-hidden mr-3 shrink-0 bg-canvas-surface">
-                    {cafe.image_url ? (
-                      <img src={cafe.image_url} alt={cafe.name} className="object-cover w-full h-full" />
-                    ) : (
-                      <Coffee className="w-5 h-5 m-2 text-on-surface-variant" />
-                    )}
-                  </div>
-                  <div className="flex flex-col">
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-bold text-sm text-neutral">{cafe.name}</span>
-                      <Star className="w-3.5 h-3.5 text-secondary" />
+            <div 
+              className={`
+                relative cursor-pointer group transition-all duration-300 ease-out
+                ${isActive ? 'scale-110' : 'scale-100 hover:scale-105'}
+              `}
+            >
+              {/* The Pin */}
+              {isActive ? (
+                <div className="flex flex-col items-center">
+                  {/* Custom Active Pop-up */}
+                  <div className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 flex items-center bg-surface rounded-3xl shadow-level-2 p-1.5 pr-4 border border-outline-variant whitespace-nowrap min-w-max z-50">
+                    <div className="relative w-10 h-10 rounded-full overflow-hidden mr-3 shrink-0 bg-canvas-surface">
+                      {cafe.image_url ? (
+                        <img src={cafe.image_url} alt={cafe.name} className="object-cover w-full h-full" />
+                      ) : (
+                        <Coffee className="w-5 h-5 m-2 text-on-surface-variant" />
+                      )}
                     </div>
-                    <div className="text-xs text-on-surface-variant font-medium mt-0.5">
-                      {cafe.scores.wifi_speed.toFixed(1)} Mbps • <span className="text-power-text">{cafe.desks_available} seats left</span>
+                    <div className="flex flex-col">
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-bold text-sm text-neutral">{cafe.name}</span>
+                        <Star className="w-3.5 h-3.5 text-secondary" />
+                      </div>
+                      <div className="text-xs text-on-surface-variant font-medium mt-0.5">
+                        {cafe.scores.wifi_speed.toFixed(1)} Mbps • <span className="text-power-text">{cafe.desks_available} seats left</span>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                {/* The Active Marker */}
-                <div className="relative flex items-center justify-center bg-primary text-on-primary px-3 h-10 rounded-full shadow-level-2 font-bold z-40 text-sm border-2 border-surface">
-                  {cafe.scores.overall.toFixed(1)}
-                  <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[8px] border-transparent border-t-primary"></div>
+                  {/* The Active Marker */}
+                  <div className="relative flex items-center justify-center bg-neutral text-surface px-3 h-10 rounded-full shadow-level-2 font-bold z-40 text-sm border-2 border-surface">
+                    {cafe.scores.overall.toFixed(1)}
+                    <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[8px] border-transparent border-t-neutral"></div>
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <div className="relative flex items-center justify-center rounded-full border-2 border-surface shadow-level-1 font-bold bg-surface text-primary px-3 h-8 text-sm hover:text-secondary hover:bg-surface-container-low transition-colors">
-                <Coffee className="w-3.5 h-3.5 mr-1" /> {cafe.scores.overall.toFixed(1)}
-              </div>
-            )}
-            
-            {/* Mini Tooltip that appears on hover (if not active card) */}
-            {!isActive && (
-              <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-white text-gray-900 px-3 py-2 rounded-xl shadow-xl border border-gray-100 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                <div className="font-bold text-sm">{cafe.name}</div>
-                <div className="text-xs text-gray-500">{cafe.scores.wifi_speed.toFixed(1)} Mbps • {cafe.desks_available} desks</div>
-                <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-transparent border-t-white"></div>
-              </div>
-            )}
+              ) : (
+                <div className="relative flex items-center justify-center rounded-full border-2 border-surface shadow-level-1 font-bold bg-neutral text-surface px-3 h-8 text-sm hover:text-white hover:bg-neutral/90 transition-colors">
+                  <Coffee className="w-3.5 h-3.5 mr-1" /> {cafe.scores.overall.toFixed(1)}
+                </div>
+              )}
+              
+              {/* Mini Tooltip that appears on hover (if not active card) */}
+              {!isActive && (
+                <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-white text-gray-900 px-3 py-2 rounded-xl shadow-xl border border-gray-100 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                  <div className="font-bold text-sm">{cafe.name}</div>
+                  <div className="text-xs text-gray-500">{cafe.scores.wifi_speed.toFixed(1)} Mbps • {cafe.desks_available} desks</div>
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-transparent border-t-white"></div>
+                </div>
+              )}
+            </div>
           </div>
         </Marker>
       );
@@ -141,8 +145,8 @@ export default function Map({ cafes, activeCafeId, onCafeHover, onBoundsChange, 
   }
 
   return (
-    <div className="w-full h-full p-4 pl-0">
-      <div className="w-full h-full rounded-[24px] overflow-hidden shadow-sm border border-gray-200/50 relative">
+    <div className="w-full h-full relative">
+      <div className="w-full h-full overflow-hidden shadow-sm relative">
         <MapboxMap
           ref={mapRef}
           {...viewState}

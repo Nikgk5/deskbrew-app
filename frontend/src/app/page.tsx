@@ -13,9 +13,16 @@ export default function Home() {
   const [activeCafeId, setActiveCafeId] = useState<number | null>(null);
   const [flyToLocation, setFlyToLocation] = useState<{lat: number, lng: number} | null>(null);
   
-  // Resizer state
   const [sidebarWidth, setSidebarWidth] = useState(45);
   const [isDragging, setIsDragging] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 1024);
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleMarkerClick = (id: number) => {
     setActiveCafeId(id);
@@ -112,14 +119,34 @@ export default function Home() {
       </header>
 
       {/* Main Split Screen */}
-      <main className="flex-1 flex overflow-hidden">
-        {/* Left Sidebar */}
+      <main className="flex-1 flex overflow-hidden relative flex-col lg:flex-row">
+        {/* Right Map Panel (Full screen on mobile, right side on desktop) */}
         <section 
-          style={{ width: `${sidebarWidth}%` }}
-          className="h-full flex flex-col bg-canvas-gray z-10 relative shadow-[4px_0_24px_rgba(0,0,0,0.02)] shrink-0"
+          style={{ width: isMobile ? '100%' : `calc(${100 - sidebarWidth}% - 4px)` }}
+          className="absolute inset-0 z-0 lg:relative lg:h-full bg-mapWater grow"
         >
+          <Map 
+            cafes={cafes} 
+            activeCafeId={activeCafeId} 
+            onCafeHover={setActiveCafeId}
+            onBoundsChange={setBounds}
+            onMarkerClick={handleMarkerClick}
+            flyToLocation={flyToLocation}
+          />
+        </section>
+
+        {/* Left Sidebar (Bottom Sheet on Mobile) */}
+        <section 
+          style={{ width: isMobile ? '100%' : `${sidebarWidth}%` }}
+          className="absolute bottom-0 left-0 w-full h-[55vh] rounded-t-[2rem] flex flex-col bg-canvas-gray z-30 shadow-[0_-8px_32px_rgba(0,0,0,0.12)] lg:relative lg:h-full lg:rounded-none lg:shadow-[4px_0_24px_rgba(0,0,0,0.02)] lg:shrink-0 lg:order-first"
+        >
+          {/* Mobile Handle */}
+          <div className="w-full flex justify-center py-3 lg:hidden shrink-0 bg-canvas-gray/90 backdrop-blur-xl rounded-t-[2rem]">
+            <div className="w-12 h-1.5 bg-outline-variant rounded-full"></div>
+          </div>
+
           {/* Filters Bar */}
-          <div className="px-6 py-5 shrink-0 bg-canvas-gray/90 backdrop-blur-xl border-b border-surface-container-highest sticky top-0 z-20">
+          <div className="px-6 pb-5 pt-1 lg:pt-5 shrink-0 bg-canvas-gray/90 backdrop-blur-xl border-b border-surface-container-highest sticky top-0 z-20">
             <div className="flex items-center justify-between">
               <h2 className="text-[14px] font-semibold text-neutral flex items-center gap-2 tracking-wide">
                 <span className="w-2.5 h-2.5 rounded-full bg-tertiary"></span>
@@ -156,45 +183,17 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Draggable Divider */}
-        <div 
-          className="w-1 hover:w-1.5 hover:bg-secondary bg-surface-container-highest cursor-col-resize z-30 transition-all flex items-center justify-center shrink-0"
-          onMouseDown={() => setIsDragging(true)}
-        >
-          <div className="bg-surface border border-outline-variant rounded-full shadow-sm p-0.5 pointer-events-none absolute z-40">
-            <GripVertical className="w-3 h-3 text-outline" />
+        {/* Draggable Divider (Desktop Only) */}
+        {!isMobile && (
+          <div 
+            className="w-1 hover:w-1.5 hover:bg-secondary bg-surface-container-highest cursor-col-resize z-30 transition-all flex items-center justify-center shrink-0 order-none"
+            onMouseDown={() => setIsDragging(true)}
+          >
+            <div className="bg-surface border border-outline-variant rounded-full shadow-sm p-0.5 pointer-events-none absolute z-40">
+              <GripVertical className="w-3 h-3 text-outline" />
+            </div>
           </div>
-        </div>
-
-        {/* Right Map Panel */}
-        <section 
-          style={{ width: `calc(${100 - sidebarWidth}% - 4px)` }}
-          className="h-full bg-mapWater grow relative"
-        >
-          {/* Floating Island Search */}
-          <div className="absolute top-6 left-1/2 -translate-x-1/2 z-20 glass-panel rounded-full px-4 py-2 flex items-center gap-4">
-             <div className="flex items-center text-sm font-semibold text-neutral border-r border-neutral/10 pr-4">
-                Berlin Mitte
-             </div>
-             <div className="flex items-center text-sm font-semibold text-on-surface-variant border-r border-neutral/10 pr-4">
-                Speed: 100+ Mbps
-             </div>
-             <div className="flex items-center text-sm font-semibold text-on-surface-variant pr-2">
-                Quiet Focus
-             </div>
-             <div className="bg-primary hover:bg-primary-container text-on-primary w-8 h-8 rounded-full flex items-center justify-center cursor-pointer transition-colors shadow-md">
-                <Search className="w-4 h-4" />
-             </div>
-          </div>
-          <Map 
-            cafes={cafes} 
-            activeCafeId={activeCafeId} 
-            onCafeHover={setActiveCafeId}
-            onBoundsChange={setBounds}
-            onMarkerClick={handleMarkerClick}
-            flyToLocation={flyToLocation}
-          />
-        </section>
+        )}
       </main>
     </div>
   );
