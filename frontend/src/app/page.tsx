@@ -113,8 +113,8 @@ export default function Home() {
               className="object-contain"
             />
           </div>
-          <span className="text-[22px] tracking-tight text-primary">
-            <span className="font-semibold">DESK</span><span className="font-extrabold">BREW</span>
+          <span className="text-3xl text-primary font-bungee">
+            DESKBREW
           </span>
         </div>
       </header>

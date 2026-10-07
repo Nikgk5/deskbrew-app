@@ -69,6 +69,7 @@ const config: Config = {
       },
       fontFamily: {
         sans: ["var(--font-jetbrains)", "monospace"],
+        bungee: ["var(--font-bungee)", "cursive"],
       },
       borderRadius: {
         sm: '0.5rem',
