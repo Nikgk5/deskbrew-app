@@ -12,6 +12,7 @@ interface CafeCardProps {
 export default function CafeCard({ cafe, onHover, isActive }: CafeCardProps) {
   return (
     <div 
+      id={`cafe-${cafe.id}`}
       className={`bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-floating transition-all duration-300 border border-gray-100 ${isActive ? 'ring-2 ring-primary' : ''} mb-6`}
       onMouseEnter={() => onHover?.(cafe.id)}
       onMouseLeave={() => onHover?.(null)}
@@ -94,13 +95,13 @@ export default function CafeCard({ cafe, onHover, isActive }: CafeCardProps) {
           </div>
         </div>
 
-        {/* AI Insight */}
+        {/* Description */}
         {cafe.ai_insight && (
-          <div className="bg-amber-50/50 border border-amber-100/50 rounded-xl p-4 mb-5">
+          <div className="mb-5">
             <div className="flex items-center gap-1.5 mb-1.5">
-              <span className="text-amber-500 font-bold text-sm">✨ AI Insights</span>
+              <span className="text-gray-900 font-bold text-sm">Description</span>
             </div>
-            <p className="text-sm text-gray-700 leading-relaxed">
+            <p className="text-sm text-gray-600 leading-relaxed">
               {cafe.ai_insight}
             </p>
           </div>

@@ -17,6 +17,7 @@ interface MapProps {
   activeCafeId: number | null;
   onCafeHover: (id: number | null) => void;
   onBoundsChange: (bounds: { sw_lat: number, sw_lng: number, ne_lat: number, ne_lng: number }) => void;
+  onMarkerClick?: (id: number) => void;
 }
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
@@ -24,7 +25,7 @@ const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 // Custom minimalist style matching Apple Maps aesthetic (or close enough using a Mapbox Light style)
 const MAP_STYLE = "mapbox://styles/mapbox/light-v11"; 
 
-export default function Map({ cafes, activeCafeId, onCafeHover, onBoundsChange }: MapProps) {
+export default function Map({ cafes, activeCafeId, onCafeHover, onBoundsChange, onMarkerClick }: MapProps) {
   const mapRef = useRef<MapRef>(null);
   const [viewState, setViewState] = useState({
     longitude: 13.4050, // Berlin
@@ -60,7 +61,7 @@ export default function Map({ cafes, activeCafeId, onCafeHover, onBoundsChange }
           anchor="bottom"
           onClick={e => {
             e.originalEvent.stopPropagation();
-            // Could add click handler to scroll to card
+            onMarkerClick?.(cafe.id);
           }}
         >
           <div 
@@ -92,7 +93,7 @@ export default function Map({ cafes, activeCafeId, onCafeHover, onBoundsChange }
         </Marker>
       );
     });
-  }, [cafes, activeCafeId, onCafeHover]);
+  }, [cafes, activeCafeId, onCafeHover, onMarkerClick]);
 
   if (!MAPBOX_TOKEN) {
     return (

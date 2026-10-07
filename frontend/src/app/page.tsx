@@ -11,6 +11,14 @@ export default function Home() {
   const [cafes, setCafes] = useState<Cafe[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeCafeId, setActiveCafeId] = useState<number | null>(null);
+
+  const handleMarkerClick = (id: number) => {
+    setActiveCafeId(id);
+    const element = document.getElementById(`cafe-${id}`);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  };
   
   // Default bounds around Berlin Mitte
   const [bounds, setBounds] = useState({
@@ -110,6 +118,7 @@ export default function Home() {
             activeCafeId={activeCafeId} 
             onCafeHover={setActiveCafeId}
             onBoundsChange={setBounds}
+            onMarkerClick={handleMarkerClick}
           />
         </section>
       </main>
