@@ -115,6 +115,14 @@ export default function Map({ cafes, activeCafeId, onCafeHover, onBoundsChange, 
                   <div className="relative flex items-center justify-center bg-neutral text-surface px-3 h-10 rounded-full shadow-level-2 font-bold z-40 text-sm border-2 border-surface">
                     {cafe.scores.overall.toFixed(1)}
                     <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[8px] border-transparent border-t-neutral"></div>
+                    
+                    {/* Low seats pulse animation */}
+                    {cafe.desks_available <= 3 && (
+                      <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-error opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-error border-2 border-surface"></span>
+                      </span>
+                    )}
                   </div>
                 </div>
               ) : (
@@ -125,6 +133,14 @@ export default function Map({ cafes, activeCafeId, onCafeHover, onBoundsChange, 
                     <Coffee className="w-3.5 h-3.5 mr-1" />
                   )}
                   {cafe.scores.overall.toFixed(1)}
+                  
+                  {/* Low seats pulse animation */}
+                  {cafe.desks_available <= 3 && (
+                    <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-error opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-3 w-3 bg-error border border-surface"></span>
+                    </span>
+                  )}
                 </div>
               )}
               
