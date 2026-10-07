@@ -58,6 +58,7 @@ class Cafe(Base):
     address: Mapped[str] = mapped_column(String(500), nullable=False)
     city: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
     country: Mapped[str] = mapped_column(String(100), nullable=False)
+    type: Mapped[str] = mapped_column(String(50), nullable=False, default="cafe")
 
     # ── Spatial ───────────────────────────────────────────────────────────
     # PostGIS Point geometry — SRID 4326 (WGS 84, standard GPS coordinates)

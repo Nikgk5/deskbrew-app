@@ -79,6 +79,7 @@ class CafeResponse(BaseModel):
     country: str
     latitude: float
     longitude: float
+    type: str
 
     # Nomad metrics
     scores: NomadScores
