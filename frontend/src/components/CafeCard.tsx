@@ -6,16 +6,18 @@ import { Cafe } from '@/lib/api';
 interface CafeCardProps {
   cafe: Cafe;
   onHover?: (id: number | null) => void;
+  onClick?: () => void;
   isActive?: boolean;
 }
 
-export default function CafeCard({ cafe, onHover, isActive }: CafeCardProps) {
+export default function CafeCard({ cafe, onHover, onClick, isActive }: CafeCardProps) {
   return (
     <div 
       id={`cafe-${cafe.id}`}
-      className={`bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-floating transition-all duration-300 border border-gray-100 ${isActive ? 'ring-2 ring-primary' : ''} mb-6`}
+      className={`bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-floating transition-all duration-300 border border-gray-100 ${isActive ? 'ring-2 ring-primary' : ''} mb-6 cursor-pointer`}
       onMouseEnter={() => onHover?.(cafe.id)}
       onMouseLeave={() => onHover?.(null)}
+      onClick={onClick}
     >
       {/* Image Header */}
       <div className="relative h-56 w-full">

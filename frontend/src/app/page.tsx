@@ -11,6 +11,7 @@ export default function Home() {
   const [cafes, setCafes] = useState<Cafe[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeCafeId, setActiveCafeId] = useState<number | null>(null);
+  const [flyToLocation, setFlyToLocation] = useState<{lat: number, lng: number} | null>(null);
 
   const handleMarkerClick = (id: number) => {
     setActiveCafeId(id);
@@ -18,6 +19,11 @@ export default function Home() {
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
+  };
+
+  const handleCardClick = (cafe: Cafe) => {
+    setActiveCafeId(cafe.id);
+    setFlyToLocation({ lat: cafe.latitude, lng: cafe.longitude });
   };
   
   // Default bounds around Berlin Mitte
@@ -104,6 +110,7 @@ export default function Home() {
                     cafe={cafe} 
                     isActive={activeCafeId === cafe.id}
                     onHover={setActiveCafeId}
+                    onClick={() => handleCardClick(cafe)}
                   />
                 ))}
               </div>
@@ -119,6 +126,7 @@ export default function Home() {
             onCafeHover={setActiveCafeId}
             onBoundsChange={setBounds}
             onMarkerClick={handleMarkerClick}
+            flyToLocation={flyToLocation}
           />
         </section>
       </main>

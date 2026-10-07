@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState, useCallback, useMemo } from 'react';
+import React, { useRef, useState, useCallback, useMemo, useEffect } from 'react';
 import MapboxMap, { 
   Marker, 
   NavigationControl, 
@@ -9,7 +9,7 @@ import MapboxMap, {
   ViewStateChangeEvent
 } from 'react-map-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { Coffee } from 'lucide-react';
+import { Coffee, Star } from 'lucide-react';
 import { Cafe } from '@/lib/api';
 
 interface MapProps {
@@ -18,6 +18,7 @@ interface MapProps {
   onCafeHover: (id: number | null) => void;
   onBoundsChange: (bounds: { sw_lat: number, sw_lng: number, ne_lat: number, ne_lng: number }) => void;
   onMarkerClick?: (id: number) => void;
+  flyToLocation?: { lat: number; lng: number } | null;
 }
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
@@ -25,7 +26,7 @@ const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 // Custom minimalist style matching Apple Maps aesthetic (or close enough using a Mapbox Light style)
 const MAP_STYLE = "mapbox://styles/mapbox/light-v11"; 
 
-export default function Map({ cafes, activeCafeId, onCafeHover, onBoundsChange, onMarkerClick }: MapProps) {
+export default function Map({ cafes, activeCafeId, onCafeHover, onBoundsChange, onMarkerClick, flyToLocation }: MapProps) {
   const mapRef = useRef<MapRef>(null);
   const [viewState, setViewState] = useState({
     longitude: 13.4050, // Berlin
@@ -34,6 +35,16 @@ export default function Map({ cafes, activeCafeId, onCafeHover, onBoundsChange, 
     pitch: 45,
     bearing: 0
   });
+
+  useEffect(() => {
+    if (flyToLocation && mapRef.current) {
+      mapRef.current.flyTo({
+        center: [flyToLocation.lng, flyToLocation.lat],
+        zoom: 15,
+        duration: 1500
+      });
+    }
+  }, [flyToLocation]);
 
   const handleMoveEnd = useCallback((e: ViewStateChangeEvent) => {
     setViewState(e.viewState);
@@ -73,22 +84,48 @@ export default function Map({ cafes, activeCafeId, onCafeHover, onBoundsChange, 
             onMouseLeave={() => onCafeHover(null)}
           >
             {/* The Pin */}
-            <div className={`
-              flex items-center justify-center rounded-full border-2 border-white shadow-md font-bold
-              ${isActive ? 'bg-primary text-white w-12 h-12 shadow-xl' : 'bg-gray-900 text-white w-10 h-10'}
-            `}>
-              <Coffee className={isActive ? "w-6 h-6" : "w-5 h-5"} />
-            </div>
+            {isActive ? (
+              <div className="flex flex-col items-center">
+                {/* Custom Active Pop-up */}
+                <div className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 flex items-center bg-white rounded-2xl shadow-xl p-1.5 pr-4 border border-orange-100/50 whitespace-nowrap min-w-max z-50">
+                  <div className="relative w-10 h-10 rounded-full overflow-hidden mr-3 shrink-0 bg-gray-100">
+                    {cafe.image_url ? (
+                      <img src={cafe.image_url} alt={cafe.name} className="object-cover w-full h-full" />
+                    ) : (
+                      <Coffee className="w-5 h-5 m-2 text-gray-400" />
+                    )}
+                  </div>
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-bold text-sm text-gray-900">{cafe.name}</span>
+                      <Star className="w-3.5 h-3.5 text-orange-400" />
+                    </div>
+                    <div className="text-xs text-slate-600 font-medium mt-0.5">
+                      {cafe.scores.wifi_speed.toFixed(1)} Mbps • <span className="text-emerald-700">{cafe.desks_available} seats left</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* The Active Marker */}
+                <div className="relative flex items-center justify-center bg-[#7B3B1B] text-white w-12 h-12 rounded-full border-[3px] border-orange-500 shadow-md font-bold z-40 text-sm">
+                  {cafe.scores.overall.toFixed(1)}
+                  <div className="absolute -bottom-[9px] left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[8px] border-transparent border-t-[#7B3B1B]"></div>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center rounded-full border-2 border-white shadow-md font-bold bg-gray-900 text-white w-10 h-10">
+                <Coffee className="w-5 h-5" />
+              </div>
+            )}
             
             {/* Mini Tooltip that appears on hover (if not active card) */}
-            <div className={`
-              absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-white text-gray-900 px-3 py-2 rounded-xl shadow-xl border border-gray-100 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none
-              ${isActive ? 'hidden' : 'block'}
-            `}>
-              <div className="font-bold text-sm">{cafe.name}</div>
-              <div className="text-xs text-gray-500">{cafe.scores.wifi_speed} Mbps • {cafe.desks_available} desks</div>
-              <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-transparent border-t-white"></div>
-            </div>
+            {!isActive && (
+              <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-white text-gray-900 px-3 py-2 rounded-xl shadow-xl border border-gray-100 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                <div className="font-bold text-sm">{cafe.name}</div>
+                <div className="text-xs text-gray-500">{cafe.scores.wifi_speed.toFixed(1)} Mbps • {cafe.desks_available} desks</div>
+                <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-transparent border-t-white"></div>
+              </div>
+            )}
           </div>
         </Marker>
       );
