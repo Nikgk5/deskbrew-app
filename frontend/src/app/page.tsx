@@ -107,7 +107,7 @@ export default function Home() {
         <div className="flex items-center gap-2.5">
           <div className="relative w-8 h-8 flex items-center justify-center">
             <Image 
-              src="/icon.png" 
+              src="/icon.jpg" 
               alt="DeskBrew Logo" 
               fill
               className="object-contain"
