@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
+import { JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import 'mapbox-gl/dist/mapbox-gl.css';
 
-const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], variable: '--font-jakarta' });
+const jetbrains = JetBrains_Mono({ subsets: ["latin"], variable: '--font-jetbrains' });
 
 export const metadata: Metadata = {
   title: "DeskBrew - Explore Remote Work Cafes",
@@ -17,7 +17,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${jakarta.variable} font-sans antialiased bg-background text-on-background`}>
+      <body className={`${jetbrains.variable} font-sans antialiased bg-background text-on-background`}>
         {children}
       </body>
     </html>

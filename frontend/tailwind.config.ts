@@ -68,7 +68,7 @@ const config: Config = {
         mapWater: "#d6e5f3", // kept for map
       },
       fontFamily: {
-        sans: ["var(--font-jakarta)", "sans-serif"],
+        sans: ["var(--font-jetbrains)", "monospace"],
       },
       borderRadius: {
         sm: '0.5rem',
