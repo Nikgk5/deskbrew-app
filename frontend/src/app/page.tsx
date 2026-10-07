@@ -17,6 +17,70 @@ export default function Home() {
   const [sidebarWidth, setSidebarWidth] = useState(45);
   const [isDragging, setIsDragging] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  
+  // Mobile Bottom Sheet State
+  const [mobileSheetHeight, setMobileSheetHeight] = useState(55); // vh
+  const [isMobileDragging, setIsMobileDragging] = useState(false);
+
+  // Mobile Touch Handlers
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setIsMobileDragging(true);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isMobileDragging) return;
+    const touchY = e.touches[0].clientY;
+    const vh = window.innerHeight;
+    const newHeight = ((vh - touchY) / vh) * 100;
+    
+    if (newHeight >= 15 && newHeight <= 95) {
+      setMobileSheetHeight(newHeight);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    setIsMobileDragging(false);
+    // Snap points
+    if (mobileSheetHeight < 30) setMobileSheetHeight(20);
+    else if (mobileSheetHeight > 80) setMobileSheetHeight(90);
+    else setMobileSheetHeight(55);
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsMobileDragging(true);
+  };
+
+  useEffect(() => {
+    const handleWindowMouseMove = (e: MouseEvent) => {
+      if (!isMobileDragging) return;
+      const vh = window.innerHeight;
+      const newHeight = ((vh - e.clientY) / vh) * 100;
+      if (newHeight >= 15 && newHeight <= 95) {
+        setMobileSheetHeight(newHeight);
+      }
+    };
+    
+    const handleWindowMouseUp = () => {
+      if (isMobileDragging) {
+        setIsMobileDragging(false);
+        if (mobileSheetHeight < 30) setMobileSheetHeight(20);
+        else if (mobileSheetHeight > 80) setMobileSheetHeight(90);
+        else setMobileSheetHeight(55);
+      }
+    };
+
+    if (isMobileDragging && window.innerWidth < 1024) {
+      window.addEventListener('mousemove', handleWindowMouseMove);
+      window.addEventListener('mouseup', handleWindowMouseUp);
+      document.body.style.userSelect = 'none';
+    }
+
+    return () => {
+      window.removeEventListener('mousemove', handleWindowMouseMove);
+      window.removeEventListener('mouseup', handleWindowMouseUp);
+      if (window.innerWidth < 1024) document.body.style.userSelect = 'auto';
+    };
+  }, [isMobileDragging, mobileSheetHeight]);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 1024);
@@ -101,7 +165,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="flex flex-col h-screen bg-canvas-gray overflow-hidden">
+    <div className="flex flex-col h-[100dvh] bg-canvas-gray overflow-hidden overscroll-none">
       {/* Top Navbar */}
       <header className="h-16 bg-surface border-b border-surface-container-highest flex items-center justify-between px-6 shrink-0 z-20">
         <div className="flex items-center gap-2.5">
@@ -138,11 +202,21 @@ export default function Home() {
 
         {/* Left Sidebar (Bottom Sheet on Mobile) */}
         <section 
-          style={{ width: isMobile ? '100%' : `${sidebarWidth}%` }}
-          className="absolute bottom-0 left-0 w-full h-[55vh] rounded-t-[2rem] flex flex-col bg-canvas-gray z-30 shadow-[0_-8px_32px_rgba(0,0,0,0.12)] lg:relative lg:h-full lg:rounded-none lg:shadow-[4px_0_24px_rgba(0,0,0,0.02)] lg:shrink-0 lg:order-first"
+          style={{ 
+            width: isMobile ? '100%' : `${sidebarWidth}%`,
+            height: isMobile ? `${mobileSheetHeight}vh` : '100%',
+            transition: isMobileDragging ? 'none' : 'height 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)'
+          }}
+          className="absolute bottom-0 left-0 w-full rounded-t-[2rem] flex flex-col bg-canvas-gray z-30 shadow-[0_-8px_32px_rgba(0,0,0,0.12)] lg:relative lg:rounded-none lg:shadow-[4px_0_24px_rgba(0,0,0,0.02)] lg:shrink-0 lg:order-first"
         >
           {/* Mobile Handle */}
-          <div className="w-full flex justify-center py-3 lg:hidden shrink-0 bg-canvas-gray/90 backdrop-blur-xl rounded-t-[2rem]">
+          <div 
+            className="w-full flex justify-center py-3 lg:hidden shrink-0 bg-canvas-gray/90 backdrop-blur-xl rounded-t-[2rem] active:bg-surface-dim touch-none cursor-grab active:cursor-grabbing"
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            onMouseDown={handleMouseDown}
+          >
             <div className="w-12 h-1.5 bg-outline-variant rounded-full"></div>
           </div>
 

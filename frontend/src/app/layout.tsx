@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { JetBrains_Mono, Bungee_Shade } from "next/font/google";
+import { Inter, Bungee_Shade } from "next/font/google";
 import "./globals.css";
 import 'mapbox-gl/dist/mapbox-gl.css';
 
-const jetbrains = JetBrains_Mono({ subsets: ["latin"], variable: '--font-jetbrains' });
+const inter = Inter({ subsets: ["latin"], variable: '--font-inter' });
 const bungeeShade = Bungee_Shade({ weight: "400", subsets: ["latin"], variable: '--font-bungee' });
 
 export const metadata: Metadata = {
@@ -18,7 +18,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${jetbrains.variable} ${bungeeShade.variable} font-sans antialiased bg-background text-on-background`}>
+      <body className={`${inter.variable} ${bungeeShade.variable} font-sans antialiased bg-background text-on-background overflow-hidden overscroll-none`}>
         {children}
       </body>
     </html>
