@@ -1,5 +1,7 @@
 # ☕️ DeskBrew — Remote Work Cafe Finder
 
+*[Διαβάστε το README στα Ελληνικά (Read in Greek)](README_GR.md)*
+
 DeskBrew is a full-stack, map-based web application tailored specifically for digital nomads and remote workers. Designed with a clean, Airbnb-inspired aesthetic, the app allows users to seamlessly discover work-friendly cafes and workspaces globally based on critical metrics like WiFi speed, quietness, and available power outlets.
 
 > **Note to Recruiters:** This repository is heavily engineered on the backend to showcase robust **Python**, **SQL**, and **Database Administration** skills. While the frontend features a premium, polished user interface, the core of the application relies on advanced spatial queries, database automation, and a highly structured Python REST API.
