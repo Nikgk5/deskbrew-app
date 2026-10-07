@@ -15,6 +15,7 @@ export interface Cafe {
   country: string;
   latitude: number;
   longitude: number;
+  type: string;
   scores: NomadScores;
   has_power_outlets: boolean;
   is_open_late: boolean;

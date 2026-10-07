@@ -9,7 +9,7 @@ import MapboxMap, {
   ViewStateChangeEvent
 } from 'react-map-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { Coffee, Star } from 'lucide-react';
+import { Coffee, Star, Laptop } from 'lucide-react';
 import { Cafe } from '@/lib/api';
 
 interface MapProps {
@@ -91,11 +91,13 @@ export default function Map({ cafes, activeCafeId, onCafeHover, onBoundsChange, 
                 <div className="flex flex-col items-center">
                   {/* Custom Active Pop-up */}
                   <div className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 flex items-center bg-surface rounded-3xl shadow-level-2 p-1.5 pr-4 border border-outline-variant whitespace-nowrap min-w-max z-50">
-                    <div className="relative w-10 h-10 rounded-full overflow-hidden mr-3 shrink-0 bg-canvas-surface">
+                    <div className="relative w-10 h-10 rounded-full overflow-hidden mr-3 shrink-0 bg-canvas-surface flex items-center justify-center">
                       {cafe.image_url ? (
                         <img src={cafe.image_url} alt={cafe.name} className="object-cover w-full h-full" />
+                      ) : cafe.type === 'workspace' ? (
+                        <Laptop className="w-5 h-5 text-on-surface-variant" />
                       ) : (
-                        <Coffee className="w-5 h-5 m-2 text-on-surface-variant" />
+                        <Coffee className="w-5 h-5 text-on-surface-variant" />
                       )}
                     </div>
                     <div className="flex flex-col">
@@ -117,7 +119,12 @@ export default function Map({ cafes, activeCafeId, onCafeHover, onBoundsChange, 
                 </div>
               ) : (
                 <div className="relative flex items-center justify-center rounded-full border-2 border-surface shadow-level-1 font-bold bg-neutral text-surface px-3 h-8 text-sm hover:text-white hover:bg-neutral/90 transition-colors">
-                  <Coffee className="w-3.5 h-3.5 mr-1" /> {cafe.scores.overall.toFixed(1)}
+                  {cafe.type === 'workspace' ? (
+                    <Laptop className="w-3.5 h-3.5 mr-1" />
+                  ) : (
+                    <Coffee className="w-3.5 h-3.5 mr-1" />
+                  )}
+                  {cafe.scores.overall.toFixed(1)}
                 </div>
               )}
               

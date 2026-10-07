@@ -12,6 +12,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [activeCafeId, setActiveCafeId] = useState<number | null>(null);
   const [flyToLocation, setFlyToLocation] = useState<{lat: number, lng: number} | null>(null);
+  const [activeType, setActiveType] = useState<'all' | 'cafe' | 'workspace'>('all');
   
   const [sidebarWidth, setSidebarWidth] = useState(45);
   const [isDragging, setIsDragging] = useState(false);
@@ -126,7 +127,7 @@ export default function Home() {
           className="absolute inset-0 z-0 lg:relative lg:h-full bg-mapWater grow"
         >
           <Map 
-            cafes={cafes} 
+            cafes={cafes.filter(c => activeType === 'all' || c.type === activeType)} 
             activeCafeId={activeCafeId} 
             onCafeHover={setActiveCafeId}
             onBoundsChange={setBounds}
@@ -146,12 +147,34 @@ export default function Home() {
           </div>
 
           {/* Filters Bar */}
-          <div className="px-6 pb-5 pt-1 lg:pt-5 shrink-0 bg-canvas-gray/90 backdrop-blur-xl border-b border-surface-container-highest sticky top-0 z-20">
+          <div className="px-6 pb-4 pt-1 lg:pt-5 shrink-0 bg-canvas-gray/90 backdrop-blur-xl border-b border-surface-container-highest sticky top-0 z-20 flex flex-col gap-4">
             <div className="flex items-center justify-between">
               <h2 className="text-[14px] font-semibold text-neutral flex items-center gap-2 tracking-wide">
                 <span className="w-2.5 h-2.5 rounded-full bg-tertiary"></span>
-                {loading ? '...' : cafes.length} work-friendly spots available
+                {loading ? '...' : cafes.length} work-friendly spots
               </h2>
+            </div>
+            
+            {/* Type Toggle */}
+            <div className="flex bg-surface-container-highest p-1 rounded-xl">
+              <button 
+                onClick={() => setActiveType('all')}
+                className={`flex-1 text-sm font-semibold py-1.5 rounded-lg transition-colors ${activeType === 'all' ? 'bg-surface shadow-sm text-primary' : 'text-on-surface-variant hover:text-neutral'}`}
+              >
+                All
+              </button>
+              <button 
+                onClick={() => setActiveType('cafe')}
+                className={`flex-1 text-sm font-semibold py-1.5 rounded-lg transition-colors ${activeType === 'cafe' ? 'bg-surface shadow-sm text-primary' : 'text-on-surface-variant hover:text-neutral'}`}
+              >
+                Cafes
+              </button>
+              <button 
+                onClick={() => setActiveType('workspace')}
+                className={`flex-1 text-sm font-semibold py-1.5 rounded-lg transition-colors ${activeType === 'workspace' ? 'bg-surface shadow-sm text-primary' : 'text-on-surface-variant hover:text-neutral'}`}
+              >
+                Workspaces
+              </button>
             </div>
           </div>
 
@@ -169,7 +192,7 @@ export default function Home() {
               </div>
             ) : (
               <div className="flex flex-col">
-                {cafes.map(cafe => (
+                {cafes.filter(c => activeType === 'all' || c.type === activeType).map(cafe => (
                   <CafeCard 
                     key={cafe.id} 
                     cafe={cafe} 
