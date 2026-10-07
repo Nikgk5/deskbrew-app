@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { Search, Filter, Compass, Bell, User } from 'lucide-react';
+import { Search, Filter, Compass, Bell, User, GripVertical } from 'lucide-react';
 import Map from '@/components/Map';
 import CafeCard from '@/components/CafeCard';
 import { fetchAllCafes, Cafe } from '@/lib/api';
@@ -12,9 +12,17 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [activeCafeId, setActiveCafeId] = useState<number | null>(null);
   const [flyToLocation, setFlyToLocation] = useState<{lat: number, lng: number} | null>(null);
+  
+  // Resizer state
+  const [sidebarWidth, setSidebarWidth] = useState(45);
+  const [isDragging, setIsDragging] = useState(false);
 
   const handleMarkerClick = (id: number) => {
     setActiveCafeId(id);
+    const cafe = cafes.find(c => c.id === id);
+    if (cafe) {
+      setFlyToLocation({ lat: cafe.latitude, lng: cafe.longitude });
+    }
     const element = document.getElementById(`cafe-${id}`);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -30,6 +38,37 @@ export default function Home() {
   const [bounds, setBounds] = useState({
     sw_lat: 52.48, sw_lng: 13.35, ne_lat: 52.55, ne_lng: 13.46
   });
+
+  // Handle Dragging to Resize
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDragging) return;
+      const newWidth = (e.clientX / window.innerWidth) * 100;
+      if (newWidth >= 20 && newWidth <= 80) {
+        setSidebarWidth(newWidth);
+      }
+    };
+    
+    const handleMouseUp = () => {
+      setIsDragging(false);
+      document.body.style.cursor = 'default';
+    };
+
+    if (isDragging) {
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = 'col-resize';
+      // Disable text selection globally while dragging
+      document.body.style.userSelect = 'none';
+    } else {
+      document.body.style.userSelect = 'auto';
+    }
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDragging]);
 
   useEffect(() => {
     let isMounted = true;
@@ -76,8 +115,11 @@ export default function Home() {
 
       {/* Main Split Screen */}
       <main className="flex-1 flex overflow-hidden">
-        {/* Left Sidebar (45%) */}
-        <section className="w-[45%] h-full flex flex-col bg-background z-10 relative shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
+        {/* Left Sidebar */}
+        <section 
+          style={{ width: `${sidebarWidth}%` }}
+          className="h-full flex flex-col bg-background z-10 relative shadow-[4px_0_24px_rgba(0,0,0,0.02)] shrink-0"
+        >
           {/* Filters Bar */}
           <div className="px-6 py-5 shrink-0 bg-background/80 backdrop-blur-xl border-b border-gray-200/50 sticky top-0 z-20">
             <div className="flex items-center justify-between">
@@ -118,8 +160,21 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Right Map Panel (55%) */}
-        <section className="w-[55%] h-full bg-mapWater">
+        {/* Draggable Divider */}
+        <div 
+          className="w-1 hover:w-1.5 hover:bg-orange-400 bg-gray-200 cursor-col-resize z-30 transition-all flex items-center justify-center shrink-0"
+          onMouseDown={() => setIsDragging(true)}
+        >
+          <div className="bg-white border border-gray-300 rounded-full shadow-sm p-0.5 pointer-events-none absolute z-40">
+            <GripVertical className="w-3 h-3 text-gray-500" />
+          </div>
+        </div>
+
+        {/* Right Map Panel */}
+        <section 
+          style={{ width: `calc(${100 - sidebarWidth}% - 4px)` }}
+          className="h-full bg-mapWater grow"
+        >
           <Map 
             cafes={cafes} 
             activeCafeId={activeCafeId} 
