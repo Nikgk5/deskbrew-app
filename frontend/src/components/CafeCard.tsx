@@ -10,7 +10,19 @@ interface CafeCardProps {
   isActive?: boolean;
 }
 
+const FALLBACK_IMAGES = [
+  "https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=800&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1497935586351-b67a49e012bf?q=80&w=800&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1525610553991-2bede1a236e2?q=80&w=800&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1588195538326-c5b1e9f80a1b?q=80&w=800&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1509042239860-f550ce710b93?q=80&w=800&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1600093463592-8e36ae95ef56?q=80&w=800&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1498804103079-a6351b050096?q=80&w=800&auto=format&fit=crop"
+];
+
 export default function CafeCard({ cafe, onHover, onClick, isActive }: CafeCardProps) {
+  const displayImage = cafe.image_url || FALLBACK_IMAGES[cafe.id % FALLBACK_IMAGES.length];
+
   return (
     <div 
       id={`cafe-${cafe.id}`}
@@ -22,17 +34,13 @@ export default function CafeCard({ cafe, onHover, onClick, isActive }: CafeCardP
       {/* Image Header */}
       <div className="relative h-56 w-full p-2 pb-0">
         <div className="relative w-full h-full rounded-[1.25rem] overflow-hidden">
-          {cafe.image_url ? (
-            <Image 
-              src={cafe.image_url} 
-              alt={cafe.name} 
-              fill 
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, 45vw"
-            />
-          ) : (
-            <div className="w-full h-full bg-surface-dim flex items-center justify-center text-on-surface-variant font-medium">No Image</div>
-          )}
+          <Image 
+            src={displayImage} 
+            alt={cafe.name} 
+            fill 
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, 45vw"
+          />
           
           {/* Availability Badge */}
           <div className="absolute bottom-3 left-3">
