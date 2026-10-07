@@ -4,6 +4,8 @@
 
 DeskBrew is a full-stack, map-based web application tailored specifically for digital nomads and remote workers. Designed with a clean, Airbnb-inspired aesthetic, the app allows users to seamlessly discover work-friendly cafes and workspaces globally based on critical metrics like WiFi speed, quietness, and available power outlets.
 
+> **🌍 Live Demo:** [https://deskbrew-app.vercel.app](https://deskbrew-app.vercel.app)
+
 > **Note to Recruiters:** This repository is heavily engineered on the backend to showcase robust **Python**, **SQL**, and **Database Administration** skills. While the frontend features a premium, polished user interface, the core of the application relies on advanced spatial queries, database automation, and a highly structured Python REST API.
 
 ---
