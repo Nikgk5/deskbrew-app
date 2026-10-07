@@ -1,82 +1,92 @@
-# ☕️ DeskBrew — Explore Remote Work Cafes
+# ☕️ DeskBrew — Remote Work Cafe Finder
 
-DeskBrew is a professional, full-stack map-based web application tailored specifically for digital nomads seeking the best remote-work cafes. It features an Airbnb-inspired split-screen layout, real-time map bounds querying, and nomad-centric metrics (WiFi speeds, outlet availability, quietness scores).
+DeskBrew is a full-stack, map-based web application tailored specifically for digital nomads and remote workers. Designed with a clean, Airbnb-inspired aesthetic, the app allows users to seamlessly discover work-friendly cafes and workspaces globally based on critical metrics like WiFi speed, quietness, and available power outlets.
 
-![DeskBrew Desktop UI Concept](https://images.unsplash.com/photo-1498804103079-a6351b050096?w=1200&q=80) <!-- Replace with actual screenshot -->
+> **Note to Recruiters:** This repository is heavily engineered on the backend to showcase robust **Python**, **SQL**, and **Database Administration** skills. While the frontend features a premium, polished user interface, the core of the application relies on advanced spatial queries, database automation, and a highly structured Python REST API.
 
-## 🏗 Architecture & Tech Stack
+---
 
-This project strictly separates the backend API from the frontend UI, communicating via a RESTful JSON API.
+## 🐍 Python & SQL Engineering Highlights
 
-### 🐍 Backend (Python / FastAPI)
-- **Framework:** [FastAPI](https://fastapi.tiangolo.com/) - High performance, automatic OpenAPI documentation.
-- **Database:** PostgreSQL hosted on [Supabase](https://supabase.com).
-- **ORM & Spatial Queries:** SQLAlchemy 2.0 with [GeoAlchemy2](https://geoalchemy-2.readthedocs.io/).
-- **Geospatial Engine:** [PostGIS](https://postgis.net/) enabling sub-millisecond bounding-box viewport queries (`ST_Within`, `ST_MakeEnvelope`) backed by a GIST index.
-- **Validation:** Pydantic V2 for strict API request/response contracts.
-- **Structure:** Domain-driven design separating routes (`api/`), business logic (`crud/`), schemas (`schemas/`), and models (`models/`).
+This project was built from the ground up to demonstrate a production-ready approach to backend architecture, data management, and automated maintenance. 
 
-### ⚛️ Frontend (Next.js / React)
-- **Framework:** [Next.js](https://nextjs.org/) App Router for server/client component rendering.
-- **Map Integration:** [react-map-gl](https://visgl.github.io/react-map-gl/) wrapping Mapbox GL JS for smooth, interactive cartography.
-- **Styling:** [Tailwind CSS](https://tailwindcss.com/) mapped to a custom design system reflecting an "Apple Maps Light Mode" aesthetic (glassmorphism, subtle shadows, crisp typography).
-- **Icons:** [Lucide React](https://lucide.dev/).
-- **State Management:** React hooks synchronizing Mapbox `viewState` with the sidebar's data fetching layer.
+### 1. Robust Data Pipelines & Seeding Automation
+Instead of manual database entries, the project uses a custom-built data migration pipeline combining **Python** and **SQL**:
+- **`backend/run_seed_*.py` Scripts:** These Python scripts automate the process of securely connecting to the PostgreSQL database via `SQLAlchemy` and executing complex SQL migrations. 
+- **`backend/sql/*.sql` Files:** These files define the database schema and insert curated data. They are written to be **idempotent** (meaning they can run multiple times without causing errors or duplicating data) by using advanced PostgreSQL commands like `ON CONFLICT DO UPDATE`. This allows the database to be updated seamlessly as new cafes are added.
+
+### 2. Geospatial Database Architecture (PostGIS)
+Finding cafes within a specific map view requires highly optimized database queries:
+- **Spatial Data Types:** The database leverages the **PostGIS** extension to store cafe locations not just as numbers, but as actual geographic points (`ST_SetSRID(ST_MakePoint(...))`).
+- **Dynamic Bounding Box Queries:** When a user drags the map on the frontend, a Python API endpoint receives the map's coordinates and translates them into a highly efficient SQL query using `ST_MakeEnvelope` and `ST_Within`. This allows the database to instantly filter and return only the cafes currently visible on the user's screen.
+
+### 3. Automated Database Maintenance (`pg_cron`)
+To prevent the free-tier cloud database from being suspended due to inactivity, I implemented a zero-cost automated maintenance job:
+- **`sql/006_prevent_idle.sql`**: This script enables the native PostgreSQL `pg_cron` extension directly inside the database. It schedules a lightweight, automated background task (`SELECT 1;`) to run every day at midnight. This demonstrates a deep understanding of database-level cron jobs and server resource management.
+
+### 4. High-Performance API Design (FastAPI)
+- The entire backend is built with **Python's FastAPI**, known for its speed and asynchronous capabilities.
+- It uses **Pydantic V2** to strictly validate all incoming map coordinates and outgoing cafe data, ensuring the frontend never receives malformed data.
+- The codebase follows **Domain-Driven Design**, cleanly separating API routes, business logic, and database models for maximum scalability.
+
+---
+
+## 🏗 Full Tech Stack
+
+### Backend
+- **Language:** Python 3
+- **Framework:** FastAPI
+- **Database:** PostgreSQL (hosted on Supabase)
+- **Geospatial Engine:** PostGIS
+- **ORM:** SQLAlchemy 2.0 & GeoAlchemy2
+
+### Frontend
+- **Framework:** Next.js (React) / App Router
+- **Map Integration:** Mapbox GL JS via `react-map-gl`
+- **Styling:** Tailwind CSS (Custom Design System, Glassmorphism)
+- **Icons:** Lucide React
+
+---
 
 ## 🚀 Getting Started
 
-### 1. Database Setup (Supabase)
-1. Create a new [Supabase](https://supabase.com/) project.
-2. Go to the SQL Editor and execute the schema initialization script:
-   ```bash
-   cat backend/sql/001_create_cafes_table.sql
-   ```
-3. Execute the seed data script to populate Berlin cafes:
-   ```bash
-   cat backend/sql/002_seed_cafes.sql
-   ```
+### 1. Database Setup
+Ensure you have a PostgreSQL database with the PostGIS extension enabled (e.g., via Supabase).
+Execute the initialization and seed scripts using the Python runners:
+```bash
+cd backend
+python run_seed_4.py # Sets up schema and initial cafes
+python run_seed_5.py # Adds supplementary data
+python run_seed_6.py # Enables the pg_cron idle-prevention task
+```
 
 ### 2. Backend Setup
 ```bash
 cd backend
-python3 -m venv venv
+python -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 
-# Configure environment variables
+# Configure environment variables (copy .env.example to .env and add your DB URL)
 cp .env.example .env
-# Edit .env with your Supabase Postgres URL
 
 # Run the FastAPI server
 uvicorn app.main:app --reload --port 8000
 ```
-API Documentation available at: `http://localhost:8000/docs`
+API Documentation auto-generates at: `http://localhost:8000/docs`
 
 ### 3. Frontend Setup
 ```bash
 cd frontend
 npm install
 
-# Configure environment variables
+# Configure environment variables (copy .env.local.example to .env.local and add your Mapbox token)
 cp .env.local.example .env.local
-# Edit .env.local with your Mapbox Public Token
 
 # Run the Next.js development server
 npm run dev
 ```
 Open `http://localhost:3000` in your browser.
 
-## 🎨 UI/UX Highlights
-- **Dynamic Bounding Box Search:** As the user pans and zooms the map, the frontend calculates the geographic bounding box coordinates (SW/NE corners) and triggers a fast PostGIS query, dynamically updating the sidebar.
-- **Rich Cafe Profile Cards:** Features custom AI Insights, visual metric pills (WiFi, Outlets, Quietness), and live availability indicators.
-- **Custom Mapbox Styling:** Floating circular score markers, disabled default logos/controls, and custom Apple-style map switchers (Map/Satellite).
-
-## 🧪 Testing
-The backend includes a suite of integration tests using FastAPI's `TestClient`.
-```bash
-cd backend
-pytest tests/
-```
-
 ---
-*Designed & Engineered as a portfolio piece showcasing scalable API design and premium frontend execution.*
+*Designed & Engineered as a comprehensive portfolio piece showcasing scalable backend architecture, SQL proficiency, and premium frontend execution.*
