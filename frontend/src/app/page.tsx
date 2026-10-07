@@ -14,7 +14,7 @@ export default function Home() {
   const [flyToLocation, setFlyToLocation] = useState<{lat: number, lng: number} | null>(null);
   const [activeType, setActiveType] = useState<'all' | 'cafe' | 'workspace'>('all');
   
-  const [sidebarWidth, setSidebarWidth] = useState(45);
+  const [sidebarWidth, setSidebarWidth] = useState(50);
   const [isDragging, setIsDragging] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   
@@ -188,28 +188,13 @@ export default function Home() {
         className="flex-1 flex overflow-hidden relative flex-col lg:flex-row"
         style={{ 
           '--sidebar-width': `${sidebarWidth}%`,
-          '--map-width': `calc(${100 - sidebarWidth}% - 4px)`,
           '--mobile-sheet-height': `${mobileSheetHeight}vh`
         } as React.CSSProperties}
       >
-        {/* Right Map Panel (Full screen on mobile, right side on desktop) */}
-        <section 
-          className="absolute inset-0 z-0 lg:relative lg:h-full bg-mapWater grow w-full lg:w-[var(--map-width)]"
-        >
-          <Map 
-            cafes={cafes.filter(c => activeType === 'all' || c.type === activeType)} 
-            activeCafeId={activeCafeId} 
-            onCafeHover={setActiveCafeId}
-            onBoundsChange={setBounds}
-            onMarkerClick={handleMarkerClick}
-            flyToLocation={flyToLocation}
-          />
-        </section>
-
         {/* Left Sidebar (Bottom Sheet on Mobile) */}
         <section 
           style={{ transition: isMobileDragging ? 'none' : 'height 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)' }}
-          className="absolute bottom-0 left-0 w-full lg:w-[var(--sidebar-width)] h-[var(--mobile-sheet-height)] lg:h-full rounded-t-[2rem] flex flex-col bg-canvas-gray z-30 shadow-[0_-8px_32px_rgba(0,0,0,0.12)] lg:relative lg:rounded-none lg:shadow-[4px_0_24px_rgba(0,0,0,0.02)] lg:shrink-0 lg:order-first"
+          className="absolute bottom-0 left-0 w-full lg:w-[var(--sidebar-width)] h-[var(--mobile-sheet-height)] lg:h-full rounded-t-[2rem] flex flex-col bg-canvas-gray z-30 shadow-[0_-8px_32px_rgba(0,0,0,0.12)] lg:relative lg:rounded-none lg:shadow-[4px_0_24px_rgba(0,0,0,0.02)] lg:shrink-0"
         >
           {/* Mobile Handle */}
           <div 
@@ -293,13 +278,27 @@ export default function Home() {
 
         {/* Draggable Divider (Desktop Only) */}
         <div 
-          className="hidden w-1 hover:w-1.5 hover:bg-secondary bg-surface-container-highest cursor-col-resize z-30 transition-all lg:flex items-center justify-center shrink-0 order-none"
+          className="hidden w-1 hover:w-1.5 hover:bg-secondary bg-surface-container-highest cursor-col-resize z-30 transition-all lg:flex items-center justify-center shrink-0 relative"
           onMouseDown={() => setIsDragging(true)}
         >
-          <div className="bg-surface border border-outline-variant rounded-full shadow-sm p-0.5 pointer-events-none absolute z-40">
+          <div className="bg-surface border border-outline-variant rounded-full shadow-sm p-0.5 pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-40 flex items-center justify-center">
             <GripVertical className="w-3 h-3 text-outline" />
           </div>
         </div>
+
+        {/* Right Map Panel (Full screen on mobile, right side on desktop) */}
+        <section 
+          className="absolute inset-0 z-0 lg:relative lg:h-full bg-mapWater grow flex-1"
+        >
+          <Map 
+            cafes={cafes.filter(c => activeType === 'all' || c.type === activeType)} 
+            activeCafeId={activeCafeId} 
+            onCafeHover={setActiveCafeId}
+            onBoundsChange={setBounds}
+            onMarkerClick={handleMarkerClick}
+            flyToLocation={flyToLocation}
+          />
+        </section>
       </main>
     </div>
   );
