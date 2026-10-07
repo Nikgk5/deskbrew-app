@@ -45,6 +45,7 @@ def _to_response(cafe: Cafe) -> CafeResponse:
         country=cafe.country,
         latitude=cafe.latitude,
         longitude=cafe.longitude,
+        type=cafe.type,
         scores=NomadScores(
             wifi_speed=float(cafe.wifi_speed),
             power_outlets=float(cafe.power_outlets),
