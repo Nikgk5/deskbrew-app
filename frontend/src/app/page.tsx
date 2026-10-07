@@ -184,11 +184,17 @@ export default function Home() {
       </header>
 
       {/* Main Split Screen */}
-      <main className="flex-1 flex overflow-hidden relative flex-col lg:flex-row">
+      <main 
+        className="flex-1 flex overflow-hidden relative flex-col lg:flex-row"
+        style={{ 
+          '--sidebar-width': `${sidebarWidth}%`,
+          '--map-width': `calc(${100 - sidebarWidth}% - 4px)`,
+          '--mobile-sheet-height': `${mobileSheetHeight}vh`
+        } as React.CSSProperties}
+      >
         {/* Right Map Panel (Full screen on mobile, right side on desktop) */}
         <section 
-          style={{ width: isMobile ? '100%' : `calc(${100 - sidebarWidth}% - 4px)` }}
-          className="absolute inset-0 z-0 lg:relative lg:h-full bg-mapWater grow"
+          className="absolute inset-0 z-0 lg:relative lg:h-full bg-mapWater grow w-full lg:w-[var(--map-width)]"
         >
           <Map 
             cafes={cafes.filter(c => activeType === 'all' || c.type === activeType)} 
@@ -202,12 +208,8 @@ export default function Home() {
 
         {/* Left Sidebar (Bottom Sheet on Mobile) */}
         <section 
-          style={{ 
-            width: isMobile ? '100%' : `${sidebarWidth}%`,
-            height: isMobile ? `${mobileSheetHeight}vh` : '100%',
-            transition: isMobileDragging ? 'none' : 'height 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)'
-          }}
-          className="absolute bottom-0 left-0 w-full rounded-t-[2rem] flex flex-col bg-canvas-gray z-30 shadow-[0_-8px_32px_rgba(0,0,0,0.12)] lg:relative lg:rounded-none lg:shadow-[4px_0_24px_rgba(0,0,0,0.02)] lg:shrink-0 lg:order-first"
+          style={{ transition: isMobileDragging ? 'none' : 'height 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)' }}
+          className="absolute bottom-0 left-0 w-full lg:w-[var(--sidebar-width)] h-[var(--mobile-sheet-height)] lg:h-full rounded-t-[2rem] flex flex-col bg-canvas-gray z-30 shadow-[0_-8px_32px_rgba(0,0,0,0.12)] lg:relative lg:rounded-none lg:shadow-[4px_0_24px_rgba(0,0,0,0.02)] lg:shrink-0 lg:order-first"
         >
           {/* Mobile Handle */}
           <div 
@@ -281,16 +283,14 @@ export default function Home() {
         </section>
 
         {/* Draggable Divider (Desktop Only) */}
-        {!isMobile && (
-          <div 
-            className="w-1 hover:w-1.5 hover:bg-secondary bg-surface-container-highest cursor-col-resize z-30 transition-all flex items-center justify-center shrink-0 order-none"
-            onMouseDown={() => setIsDragging(true)}
-          >
-            <div className="bg-surface border border-outline-variant rounded-full shadow-sm p-0.5 pointer-events-none absolute z-40">
-              <GripVertical className="w-3 h-3 text-outline" />
-            </div>
+        <div 
+          className="hidden w-1 hover:w-1.5 hover:bg-secondary bg-surface-container-highest cursor-col-resize z-30 transition-all lg:flex items-center justify-center shrink-0 order-none"
+          onMouseDown={() => setIsDragging(true)}
+        >
+          <div className="bg-surface border border-outline-variant rounded-full shadow-sm p-0.5 pointer-events-none absolute z-40">
+            <GripVertical className="w-3 h-3 text-outline" />
           </div>
-        )}
+        </div>
       </main>
     </div>
   );
