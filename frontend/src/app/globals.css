@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: #f7f7f7;
+    --foreground: #111827;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  /* Custom scrollbar for webkit */
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Mapbox specific overrides for Apple Maps aesthetic */
+.mapboxgl-ctrl-group {
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+}
+
+.mapboxgl-ctrl-group button {
+  width: 36px !important;
+  height: 36px !important;
+}
+
+/* Hide Mapbox logo for cleaner look, but keep attribution */
+.mapboxgl-ctrl-logo {
+  display: none !important;
+}
