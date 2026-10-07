@@ -42,7 +42,7 @@ export default function Home() {
     setIsMobileDragging(false);
     // Snap points
     if (mobileSheetHeight < 30) setMobileSheetHeight(20);
-    else if (mobileSheetHeight > 80) setMobileSheetHeight(90);
+    else if (mobileSheetHeight > 75) setMobileSheetHeight(82);
     else setMobileSheetHeight(55);
   };
 
@@ -64,7 +64,7 @@ export default function Home() {
       if (isMobileDragging) {
         setIsMobileDragging(false);
         if (mobileSheetHeight < 30) setMobileSheetHeight(20);
-        else if (mobileSheetHeight > 80) setMobileSheetHeight(90);
+        else if (mobileSheetHeight > 75) setMobileSheetHeight(82);
         else setMobileSheetHeight(55);
       }
     };
@@ -229,6 +229,15 @@ export default function Home() {
                 <span className="w-2.5 h-2.5 rounded-full bg-tertiary"></span>
                 {loading ? '...' : cafes.length} work-friendly spots
               </h2>
+              {mobileSheetHeight > 65 && (
+                <button 
+                  onClick={() => setMobileSheetHeight(45)}
+                  className="lg:hidden text-xs font-bold text-primary bg-primary/10 px-3 py-1.5 rounded-full flex items-center gap-1 hover:bg-primary/20 transition-colors"
+                >
+                  <Compass className="w-3.5 h-3.5" />
+                  Show Map
+                </button>
+              )}
             </div>
             
             {/* Type Toggle */}
