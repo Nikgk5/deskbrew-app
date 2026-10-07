@@ -87,34 +87,34 @@ export default function Map({ cafes, activeCafeId, onCafeHover, onBoundsChange, 
             {isActive ? (
               <div className="flex flex-col items-center">
                 {/* Custom Active Pop-up */}
-                <div className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 flex items-center bg-white rounded-2xl shadow-xl p-1.5 pr-4 border border-orange-100/50 whitespace-nowrap min-w-max z-50">
-                  <div className="relative w-10 h-10 rounded-full overflow-hidden mr-3 shrink-0 bg-gray-100">
+                <div className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 flex items-center bg-surface rounded-3xl shadow-level-2 p-1.5 pr-4 border border-outline-variant whitespace-nowrap min-w-max z-50">
+                  <div className="relative w-10 h-10 rounded-full overflow-hidden mr-3 shrink-0 bg-canvas-surface">
                     {cafe.image_url ? (
                       <img src={cafe.image_url} alt={cafe.name} className="object-cover w-full h-full" />
                     ) : (
-                      <Coffee className="w-5 h-5 m-2 text-gray-400" />
+                      <Coffee className="w-5 h-5 m-2 text-on-surface-variant" />
                     )}
                   </div>
                   <div className="flex flex-col">
                     <div className="flex items-center gap-1.5">
-                      <span className="font-bold text-sm text-gray-900">{cafe.name}</span>
-                      <Star className="w-3.5 h-3.5 text-orange-400" />
+                      <span className="font-bold text-sm text-neutral">{cafe.name}</span>
+                      <Star className="w-3.5 h-3.5 text-secondary" />
                     </div>
-                    <div className="text-xs text-slate-600 font-medium mt-0.5">
-                      {cafe.scores.wifi_speed.toFixed(1)} Mbps • <span className="text-emerald-700">{cafe.desks_available} seats left</span>
+                    <div className="text-xs text-on-surface-variant font-medium mt-0.5">
+                      {cafe.scores.wifi_speed.toFixed(1)} Mbps • <span className="text-power-text">{cafe.desks_available} seats left</span>
                     </div>
                   </div>
                 </div>
 
                 {/* The Active Marker */}
-                <div className="relative flex items-center justify-center bg-[#7B3B1B] text-white w-12 h-12 rounded-full border-[3px] border-orange-500 shadow-md font-bold z-40 text-sm">
+                <div className="relative flex items-center justify-center bg-primary text-on-primary px-3 h-10 rounded-full shadow-level-2 font-bold z-40 text-sm border-2 border-surface">
                   {cafe.scores.overall.toFixed(1)}
-                  <div className="absolute -bottom-[9px] left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[8px] border-transparent border-t-[#7B3B1B]"></div>
+                  <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[8px] border-transparent border-t-primary"></div>
                 </div>
               </div>
             ) : (
-              <div className="flex items-center justify-center rounded-full border-2 border-white shadow-md font-bold bg-gray-900 text-white w-10 h-10">
-                <Coffee className="w-5 h-5" />
+              <div className="relative flex items-center justify-center rounded-full border-2 border-surface shadow-level-1 font-bold bg-surface text-primary px-3 h-8 text-sm hover:text-secondary hover:bg-surface-container-low transition-colors">
+                <Coffee className="w-3.5 h-3.5 mr-1" /> {cafe.scores.overall.toFixed(1)}
               </div>
             )}
             
@@ -158,16 +158,16 @@ export default function Map({ cafes, activeCafeId, onCafeHover, onBoundsChange, 
         </MapboxMap>
         
         {/* Floating Controls matching Apple aesthetic */}
-        <div className="absolute top-6 left-6 z-10 bg-white/90 backdrop-blur-md rounded-full shadow-md border border-gray-100 px-4 py-2 flex items-center gap-3">
-          <label className="flex items-center gap-2 text-sm font-medium text-gray-700 cursor-pointer">
+        <div className="absolute top-6 left-6 z-10 glass-panel rounded-full px-4 py-2 flex items-center gap-3">
+          <label className="flex items-center gap-2 text-sm font-semibold text-neutral cursor-pointer">
             <input type="checkbox" className="accent-primary" defaultChecked />
             Search as I move the map
           </label>
         </div>
 
-        <div className="absolute top-6 right-6 z-10 flex bg-white/90 backdrop-blur-md rounded-full shadow-md border border-gray-100 p-1">
-          <button className="px-4 py-1.5 text-sm font-semibold bg-gray-900 text-white rounded-full">Map</button>
-          <button className="px-4 py-1.5 text-sm font-medium text-gray-600 hover:text-gray-900 rounded-full">Satellite</button>
+        <div className="absolute top-6 right-6 z-10 flex glass-panel rounded-full p-1">
+          <button className="px-4 py-1.5 text-sm font-semibold bg-neutral text-surface rounded-full shadow-md">Map</button>
+          <button className="px-4 py-1.5 text-sm font-semibold text-on-surface-variant hover:text-neutral rounded-full transition-colors">Satellite</button>
         </div>
       </div>
     </div>

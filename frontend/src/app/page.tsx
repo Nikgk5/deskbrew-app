@@ -93,9 +93,9 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="flex flex-col h-screen bg-background overflow-hidden">
+    <div className="flex flex-col h-screen bg-canvas-gray overflow-hidden">
       {/* Top Navbar */}
-      <header className="h-16 bg-white border-b border-gray-100 flex items-center justify-between px-6 shrink-0 z-20">
+      <header className="h-16 bg-surface border-b border-surface-container-highest flex items-center justify-between px-6 shrink-0 z-20">
         <div className="flex items-center gap-2.5">
           <div className="relative w-8 h-8 flex items-center justify-center">
             <Image 
@@ -105,12 +105,10 @@ export default function Home() {
               className="object-contain"
             />
           </div>
-          <span className="text-[22px] tracking-tight text-[#5a514b]">
+          <span className="text-[22px] tracking-tight text-primary">
             <span className="font-semibold">DESK</span><span className="font-extrabold">BREW</span>
           </span>
         </div>
-        
-        {/* Search and Nav removed for simplicity */}
       </header>
 
       {/* Main Split Screen */}
@@ -118,26 +116,24 @@ export default function Home() {
         {/* Left Sidebar */}
         <section 
           style={{ width: `${sidebarWidth}%` }}
-          className="h-full flex flex-col bg-background z-10 relative shadow-[4px_0_24px_rgba(0,0,0,0.02)] shrink-0"
+          className="h-full flex flex-col bg-canvas-gray z-10 relative shadow-[4px_0_24px_rgba(0,0,0,0.02)] shrink-0"
         >
           {/* Filters Bar */}
-          <div className="px-6 py-5 shrink-0 bg-background/80 backdrop-blur-xl border-b border-gray-200/50 sticky top-0 z-20">
+          <div className="px-6 py-5 shrink-0 bg-canvas-gray/90 backdrop-blur-xl border-b border-surface-container-highest sticky top-0 z-20">
             <div className="flex items-center justify-between">
-              <h2 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                {loading ? '...' : cafes.length} work-friendly spots available in this area
+              <h2 className="text-[14px] font-semibold text-neutral flex items-center gap-2 tracking-wide">
+                <span className="w-2.5 h-2.5 rounded-full bg-tertiary"></span>
+                {loading ? '...' : cafes.length} work-friendly spots available
               </h2>
             </div>
-            
-            {/* Filters and sort removed */}
           </div>
 
           {/* Scrollable Cafe List */}
-          <div className="flex-1 overflow-y-auto px-6 py-4 pb-24 relative">
+          <div className="flex-1 overflow-y-auto px-6 py-6 pb-24 relative">
             {loading ? (
               <div className="flex flex-col gap-6">
                 {[1, 2, 3].map(i => (
-                  <div key={i} className="animate-pulse bg-white rounded-2xl h-[450px] w-full shadow-sm border border-gray-100"></div>
+                  <div key={i} className="animate-pulse bg-surface rounded-3xl h-[450px] w-full shadow-level-1 border border-neutral/5"></div>
                 ))}
               </div>
             ) : cafes.length === 0 ? (
@@ -162,19 +158,34 @@ export default function Home() {
 
         {/* Draggable Divider */}
         <div 
-          className="w-1 hover:w-1.5 hover:bg-orange-400 bg-gray-200 cursor-col-resize z-30 transition-all flex items-center justify-center shrink-0"
+          className="w-1 hover:w-1.5 hover:bg-secondary bg-surface-container-highest cursor-col-resize z-30 transition-all flex items-center justify-center shrink-0"
           onMouseDown={() => setIsDragging(true)}
         >
-          <div className="bg-white border border-gray-300 rounded-full shadow-sm p-0.5 pointer-events-none absolute z-40">
-            <GripVertical className="w-3 h-3 text-gray-500" />
+          <div className="bg-surface border border-outline-variant rounded-full shadow-sm p-0.5 pointer-events-none absolute z-40">
+            <GripVertical className="w-3 h-3 text-outline" />
           </div>
         </div>
 
         {/* Right Map Panel */}
         <section 
           style={{ width: `calc(${100 - sidebarWidth}% - 4px)` }}
-          className="h-full bg-mapWater grow"
+          className="h-full bg-mapWater grow relative"
         >
+          {/* Floating Island Search */}
+          <div className="absolute top-6 left-1/2 -translate-x-1/2 z-20 glass-panel rounded-full px-4 py-2 flex items-center gap-4">
+             <div className="flex items-center text-sm font-semibold text-neutral border-r border-neutral/10 pr-4">
+                Berlin Mitte
+             </div>
+             <div className="flex items-center text-sm font-semibold text-on-surface-variant border-r border-neutral/10 pr-4">
+                Speed: 100+ Mbps
+             </div>
+             <div className="flex items-center text-sm font-semibold text-on-surface-variant pr-2">
+                Quiet Focus
+             </div>
+             <div className="bg-primary hover:bg-primary-container text-on-primary w-8 h-8 rounded-full flex items-center justify-center cursor-pointer transition-colors shadow-md">
+                <Search className="w-4 h-4" />
+             </div>
+          </div>
           <Map 
             cafes={cafes} 
             activeCafeId={activeCafeId} 

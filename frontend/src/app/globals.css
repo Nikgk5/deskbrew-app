@@ -2,16 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  :root {
-    --background: #f7f7f7;
-    --foreground: #111827;
+@layer utilities {
+  .glass-panel {
+    @apply bg-white/80 backdrop-blur-xl saturate-150 shadow-level-3 border border-white/20;
   }
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
   /* Custom scrollbar for webkit */
 }
 
@@ -24,12 +21,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: theme('colors.outline-variant');
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: theme('colors.outline');
 }
 
 /* Mapbox specific overrides for Apple Maps aesthetic */
