@@ -286,18 +286,21 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Right Map Panel (Full screen on mobile, right side on desktop) */}
+        {/* Right Map Panel (Full screen on mobile, absolute 100vw on desktop to avoid WebGL resize lag) */}
         <section 
-          className="absolute inset-0 z-0 lg:relative lg:h-full bg-mapWater grow flex-1"
+          className="absolute inset-0 z-0 lg:relative lg:h-full bg-mapWater grow flex-1 overflow-hidden"
         >
-          <Map 
-            cafes={cafes.filter(c => activeType === 'all' || c.type === activeType)} 
-            activeCafeId={activeCafeId} 
-            onCafeHover={setActiveCafeId}
-            onBoundsChange={setBounds}
-            onMarkerClick={handleMarkerClick}
-            flyToLocation={flyToLocation}
-          />
+          <div className="lg:absolute lg:top-0 lg:right-0 lg:w-[100vw] lg:h-full w-full h-full">
+            <Map 
+              cafes={cafes.filter(c => activeType === 'all' || c.type === activeType)} 
+              activeCafeId={activeCafeId} 
+              onCafeHover={setActiveCafeId}
+              onBoundsChange={setBounds}
+              onMarkerClick={handleMarkerClick}
+              flyToLocation={flyToLocation}
+              sidebarWidth={isMobile ? 0 : sidebarWidth}
+            />
+          </div>
         </section>
       </main>
     </div>

@@ -19,6 +19,7 @@ interface MapProps {
   onBoundsChange: (bounds: { sw_lat: number, sw_lng: number, ne_lat: number, ne_lng: number }) => void;
   onMarkerClick?: (id: number) => void;
   flyToLocation?: { lat: number; lng: number } | null;
+  sidebarWidth: number;
 }
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
@@ -26,7 +27,7 @@ const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 // Custom minimalist style matching Apple Maps aesthetic (or close enough using a Mapbox Light style)
 const MAP_STYLE = "mapbox://styles/mapbox/light-v11"; 
 
-export default function Map({ cafes, activeCafeId, onCafeHover, onBoundsChange, onMarkerClick, flyToLocation }: MapProps) {
+export default function Map({ cafes, activeCafeId, onCafeHover, onBoundsChange, onMarkerClick, flyToLocation, sidebarWidth }: MapProps) {
   const mapRef = useRef<MapRef>(null);
   const [viewState, setViewState] = useState({
     longitude: 13.4050, // Berlin
@@ -178,6 +179,10 @@ export default function Map({ cafes, activeCafeId, onCafeHover, onBoundsChange, 
           mapStyle={MAP_STYLE}
           mapboxAccessToken={MAPBOX_TOKEN}
           attributionControl={false}
+          padding={{ 
+            left: typeof window !== 'undefined' ? (window.innerWidth * sidebarWidth) / 100 : 0, 
+            top: 0, right: 0, bottom: 0 
+          }}
         >
           <GeolocateControl position="bottom-right" />
           <NavigationControl position="bottom-right" showCompass={true} />
@@ -185,7 +190,10 @@ export default function Map({ cafes, activeCafeId, onCafeHover, onBoundsChange, 
         </MapboxMap>
         
         {/* Floating Controls matching Apple aesthetic */}
-        <div className="absolute top-6 left-6 z-10 glass-panel rounded-full px-4 py-2 flex items-center gap-3">
+        <div 
+          className="absolute top-6 z-10 glass-panel rounded-full px-4 py-2 flex items-center gap-3 transition-all duration-75"
+          style={{ left: `calc(${sidebarWidth}vw + 1.5rem)` }}
+        >
           <label className="flex items-center gap-2 text-sm font-semibold text-neutral cursor-pointer">
             <input type="checkbox" className="accent-primary" defaultChecked />
             Search as I move the map
