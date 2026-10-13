@@ -85,7 +85,9 @@ CREATE INDEX IF NOT EXISTS idx_cafes_name
 
 -- 4. Create an update trigger for updated_at
 CREATE OR REPLACE FUNCTION update_modified_column()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER
+SET search_path = 'public'
+AS $$
 BEGIN
     NEW.updated_at = NOW();
     RETURN NEW;
