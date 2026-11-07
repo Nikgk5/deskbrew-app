@@ -1,0 +1,24 @@
+name: Keep Alive (Supabase & Render)
+
+on:
+  schedule:
+    # Runs every 2 days at 04:00 UTC (well within Supabase's 7-day inactivity limit)
+    - cron: '0 4 */2 * *'
+  workflow_dispatch: # Allows manual trigger from the GitHub Actions tab
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Backend & Database
+        run: |
+          echo "Pinging DeskBrew backend and Supabase database..."
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://deskbrew-app.onrender.com/api/v1/cafes?limit=1")
+          echo "Response HTTP Status: $HTTP_STATUS"
+          if [ "$HTTP_STATUS" -eq 200 ]; then
+            echo "Successfully kept services alive!"
+          else
+            echo "Warning: Received status $HTTP_STATUS"
+            exit 1
+          fi
+
