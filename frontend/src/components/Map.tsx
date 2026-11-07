@@ -29,6 +29,8 @@ const MAP_STYLE = "mapbox://styles/mapbox/light-v11";
 
 export default function Map({ cafes, activeCafeId, onCafeHover, onBoundsChange, onMarkerClick, flyToLocation, sidebarWidth }: MapProps) {
   const mapRef = useRef<MapRef>(null);
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   const [viewState, setViewState] = useState({
     longitude: 13.4050, // Berlin
     latitude: 52.5200,
@@ -36,6 +38,33 @@ export default function Map({ cafes, activeCafeId, onCafeHover, onBoundsChange, 
     pitch: 45,
     bearing: 0
   });
+
+  // Smooth hover transition to eliminate flickering between close pins
+  const handleMouseEnter = useCallback((id: number) => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
+    onCafeHover(id);
+  }, [onCafeHover]);
+
+  const handleMouseLeave = useCallback((id: number) => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+    }
+    hoverTimeoutRef.current = setTimeout(() => {
+      onCafeHover(null);
+      hoverTimeoutRef.current = null;
+    }, 100);
+  }, [onCafeHover]);
+
+  useEffect(() => {
+    return () => {
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (flyToLocation && mapRef.current) {
@@ -71,19 +100,20 @@ export default function Map({ cafes, activeCafeId, onCafeHover, onBoundsChange, 
           longitude={cafe.longitude}
           latitude={cafe.latitude}
           anchor="bottom"
+          style={{ zIndex: isActive ? 100 : 1 }}
           onClick={e => {
             e.originalEvent.stopPropagation();
             onMarkerClick?.(cafe.id);
           }}
         >
           <div 
-            className="p-4 -m-4 relative z-10 hover:z-50"
-            onMouseEnter={() => onCafeHover(cafe.id)}
-            onMouseLeave={() => onCafeHover(null)}
+            className="relative p-1 -m-1"
+            onMouseEnter={() => handleMouseEnter(cafe.id)}
+            onMouseLeave={() => handleMouseLeave(cafe.id)}
           >
             <div 
               className={`
-                relative cursor-pointer group transition-all duration-300 ease-out
+                relative cursor-pointer group transition-transform duration-200 ease-out origin-bottom
                 ${isActive ? 'scale-110' : 'scale-100 hover:scale-105'}
               `}
             >
@@ -91,7 +121,7 @@ export default function Map({ cafes, activeCafeId, onCafeHover, onBoundsChange, 
               {isActive ? (
                 <div className="flex flex-col items-center">
                   {/* Custom Active Pop-up */}
-                  <div className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 flex items-center bg-surface rounded-3xl shadow-level-2 p-1.5 pr-4 border border-outline-variant whitespace-nowrap min-w-max z-50">
+                  <div className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 flex items-center bg-surface rounded-3xl shadow-level-2 p-1.5 pr-4 border border-outline-variant whitespace-nowrap min-w-max z-50 pointer-events-none">
                     <div className="relative w-10 h-10 rounded-full overflow-hidden mr-3 shrink-0 bg-canvas-surface flex items-center justify-center">
                       {cafe.image_url ? (
                         <img src={cafe.image_url} alt={cafe.name} className="object-cover w-full h-full" />
@@ -113,13 +143,18 @@ export default function Map({ cafes, activeCafeId, onCafeHover, onBoundsChange, 
                   </div>
 
                   {/* The Active Marker */}
-                  <div className="relative flex items-center justify-center bg-neutral text-surface px-3 h-10 rounded-full shadow-level-2 font-bold z-40 text-sm border-2 border-surface">
+                  <div className="relative flex items-center justify-center bg-neutral text-surface px-3 h-8 rounded-full shadow-level-2 font-bold z-40 text-sm border-2 border-surface">
+                    {cafe.type === 'workspace' ? (
+                      <Laptop className="w-3.5 h-3.5 mr-1" />
+                    ) : (
+                      <Coffee className="w-3.5 h-3.5 mr-1" />
+                    )}
                     {cafe.scores.overall.toFixed(1)}
-                    <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[8px] border-transparent border-t-neutral"></div>
+                    <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[5px] border-r-[5px] border-t-[6px] border-transparent border-t-neutral pointer-events-none"></div>
                     
                     {/* Low seats pulse animation */}
                     {cafe.desks_available <= 3 && (
-                      <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
+                      <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5 pointer-events-none">
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-error opacity-75"></span>
                         <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-error border-2 border-surface"></span>
                       </span>
@@ -137,7 +172,7 @@ export default function Map({ cafes, activeCafeId, onCafeHover, onBoundsChange, 
                   
                   {/* Low seats pulse animation */}
                   {cafe.desks_available <= 3 && (
-                    <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                    <span className="absolute -top-1 -right-1 flex h-3 w-3 pointer-events-none">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-error opacity-75"></span>
                       <span className="relative inline-flex rounded-full h-3 w-3 bg-error border border-surface"></span>
                     </span>
@@ -158,7 +193,7 @@ export default function Map({ cafes, activeCafeId, onCafeHover, onBoundsChange, 
         </Marker>
       );
     });
-  }, [cafes, activeCafeId, onCafeHover, onMarkerClick]);
+  }, [cafes, activeCafeId, handleMouseEnter, handleMouseLeave, onMarkerClick]);
 
   if (!MAPBOX_TOKEN) {
     return (
