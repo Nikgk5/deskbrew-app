@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
-import { Search, Filter, Compass, Bell, User, GripVertical } from 'lucide-react';
+import { Search, Filter, Compass, Bell, User, GripVertical, Loader2, AlertCircle, RefreshCw } from 'lucide-react';
 import Map from '@/components/Map';
 import CafeCard from '@/components/CafeCard';
 import { fetchAllCafes, Cafe } from '@/lib/api';
@@ -10,6 +10,8 @@ import { fetchAllCafes, Cafe } from '@/lib/api';
 export default function Home() {
   const [cafes, setCafes] = useState<Cafe[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isSlowLoading, setIsSlowLoading] = useState(false);
+  const [hasError, setHasError] = useState(false);
   const [activeCafeId, setActiveCafeId] = useState<number | null>(null);
   const [flyToLocation, setFlyToLocation] = useState<{lat: number, lng: number} | null>(null);
   const [activeType, setActiveType] = useState<'all' | 'cafe' | 'workspace'>('all');
@@ -142,27 +144,32 @@ export default function Home() {
     };
   }, [isDragging]);
 
-  useEffect(() => {
-    let isMounted = true;
-    
-    const loadCafes = async () => {
-      setLoading(true);
-      try {
-        const data = await fetchAllCafes();
-        if (isMounted) {
-          setCafes(data.cafes);
-        }
-      } catch (error) {
-        console.error("Failed to load cafes:", error);
-      } finally {
-        if (isMounted) setLoading(false);
-      }
-    };
+  const loadCafes = useCallback(async () => {
+    setLoading(true);
+    setHasError(false);
 
-    loadCafes();
-    
-    return () => { isMounted = false; };
+    // Show friendly cold-start notice if free cloud backend takes > 3.5s
+    const slowTimer = setTimeout(() => {
+      setIsSlowLoading(true);
+    }, 3500);
+
+    try {
+      const data = await fetchAllCafes();
+      setCafes(data.cafes);
+      setHasError(false);
+    } catch (error) {
+      console.error("Failed to load cafes:", error);
+      setHasError(true);
+    } finally {
+      clearTimeout(slowTimer);
+      setIsSlowLoading(false);
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    loadCafes();
+  }, [loadCafes]);
 
   return (
     <div className="flex flex-col h-[100dvh] bg-canvas-gray overflow-hidden overscroll-none">
@@ -191,6 +198,23 @@ export default function Home() {
           '--mobile-sheet-height': `${mobileSheetHeight}vh`
         } as React.CSSProperties}
       >
+        {/* Cold Start Indicator Toast */}
+        {isSlowLoading && loading && (
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 max-w-lg w-[92%] sm:w-auto bg-surface/95 backdrop-blur-md border border-primary/20 rounded-2xl shadow-level-2 p-3.5 flex items-center gap-3 transition-all animate-in fade-in slide-in-from-top-4 duration-300 pointer-events-auto">
+            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+              <Loader2 className="w-4 h-4 text-primary animate-spin" />
+            </div>
+            <div className="flex-1 text-xs">
+              <p className="font-semibold text-neutral flex items-center gap-1.5">
+                <span>☕ Cloud Server Spinning Up</span>
+                <span className="text-[10px] bg-secondary/15 text-secondary font-bold px-1.5 py-0.5 rounded">Free Tier</span>
+              </p>
+              <p className="text-on-surface-variant mt-0.5 leading-snug">
+                FastAPI backend &amp; PostGIS database are waking up from idle state (~30s). Thank you for your patience!
+              </p>
+            </div>
+          </div>
+        )}
         {/* Left Sidebar (Bottom Sheet on Mobile) */}
         <section 
           style={{ transition: isMobileDragging ? 'none' : 'height 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)' }}
@@ -252,9 +276,37 @@ export default function Home() {
           <div className="flex-1 overflow-y-auto px-6 py-6 pb-24 relative">
             {loading ? (
               <div className="flex flex-col gap-6">
+                {isSlowLoading && (
+                  <div className="bg-surface/90 border border-primary/20 rounded-2xl p-4 text-center shadow-sm">
+                    <p className="text-xs font-semibold text-neutral flex items-center justify-center gap-1.5 mb-1">
+                      <Loader2 className="w-3.5 h-3.5 text-primary animate-spin" />
+                      Waking up cloud server...
+                    </p>
+                    <p className="text-[11px] text-on-surface-variant">
+                      First load takes ~30s on free hosting (Render spin-up)
+                    </p>
+                  </div>
+                )}
                 {[1, 2, 3].map(i => (
                   <div key={i} className="animate-pulse bg-surface rounded-3xl h-[450px] w-full shadow-level-1 border border-neutral/5"></div>
                 ))}
+              </div>
+            ) : hasError ? (
+              <div className="text-center py-16 px-4 flex flex-col items-center">
+                <div className="w-12 h-12 rounded-full bg-amber-500/10 flex items-center justify-center mb-3">
+                  <AlertCircle className="w-6 h-6 text-amber-500" />
+                </div>
+                <h3 className="font-bold text-neutral text-base mb-1">Server is still waking up</h3>
+                <p className="text-xs text-on-surface-variant max-w-xs mb-4">
+                  Render&apos;s free instance might need an extra moment to complete its cold start.
+                </p>
+                <button 
+                  onClick={() => loadCafes()}
+                  className="px-4 py-2 bg-primary text-white rounded-xl text-xs font-semibold hover:bg-primary/90 transition-all shadow-sm flex items-center gap-1.5 active:scale-95"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" />
+                  Retry Connection
+                </button>
               </div>
             ) : cafes.length === 0 ? (
               <div className="text-center py-20 text-gray-500">
